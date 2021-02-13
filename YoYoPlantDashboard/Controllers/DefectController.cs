@@ -29,6 +29,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using YoYoPlantDashboard;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 
 namespace YoYoPlantDashboard.Controllers
 {
@@ -45,12 +46,25 @@ namespace YoYoPlantDashboard.Controllers
         private readonly ILogger<DefectController> _logger;
 
         /// <summary>
+        /// Configuration
+        /// </summary>
+        private readonly IConfiguration _config;
+
+        /// <summary>
+        /// Connection string for database.
+        /// </summary>
+        private string _connectionString;
+
+        /// <summary>
         /// DefectController constructor
         /// </summary>
         /// <param name="logger"></param>
-        public DefectController(ILogger<DefectController> logger)
+        public DefectController(ILogger<DefectController> logger, IConfiguration config)
         {
             _logger = logger;
+            _config = config;
+
+            _connectionString = _config.GetValue<string>("DatabaseConnectionString");
         }
 
         /// <summary>

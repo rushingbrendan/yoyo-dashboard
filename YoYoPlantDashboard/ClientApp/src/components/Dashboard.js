@@ -26,7 +26,7 @@ import React, { useEffect } from 'react';
 import ParetoChart from 'pareto-chart'
 import DashboardDataDisplay from './DashboardDataDisplay';
 
-const MINUTE_MS = 60000;
+const SERVER_CALL_INTERVAL_MS = 30000;
 
 
 /*
@@ -61,7 +61,7 @@ export const Dashboard = () => {
 
     const interval = setInterval(() => {
       populateData(yoyoType);
-    }, MINUTE_MS);
+    }, SERVER_CALL_INTERVAL_MS);
 
     // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
     return () => clearInterval(interval); 
