@@ -1,4 +1,27 @@
-﻿import React, { useEffect } from 'react';
+﻿/*
+ *   FILE          : Dashboard.js
+ *   PROJECT       : SENG3120 - Business Intelligence - Assignment #2
+ *   PROGRAMMER    : Brendan Rushing
+ *   FIRST VERSION : 2021-02-13
+ *   DESCRIPTION   :   Create a live reportwith the following requirements:
+ *                      a.Allow the user to choose any one, or all, of the products to perform the calculations for the report.
+ *                        The choice may be changed any timeby the user, and the report should be updated immediately upon change.
+ *
+ *                      b.Use the MS Chartcontrol to display a Pareto diagram showing the reasons for rejection (rework and scrap combined).
+ *                      c.Make sure to show the actual numbers on the chart.
+ *                      d.In addition to the Pareto diagram, display the following information based on the chosen product (or all products):
+ *                        i.Total parts molded
+ *                        ii.Total parts successfully molded
+ *                        iii.Yield at Mold: (Total parts successfully molded) / (Total parts molded)
+ *                        iv.Total parts successfully painted
+ *                        v.Yield at Paint: (Total parts successfully painted) / (Total parts successfully molded)
+ *                        vi.Total parts successfully assembledvii.Yield at Assembly: (Total parts successfully assembled) / (Total parts successfully painted)
+ *                        viii.Total parts packaged
+ *                        ix.Total Yield: (Total parts packaged) / (Total parts molded)
+ *                      e.The data should be updated automaticallyusing a timer or manually using a button on the report
+ * */
+
+import React, { useEffect } from 'react';
 
 import ParetoChart from 'pareto-chart'
 import DashboardDataDisplay from './DashboardDataDisplay';
@@ -6,6 +29,12 @@ import DashboardDataDisplay from './DashboardDataDisplay';
 const MINUTE_MS = 60000;
 
 
+/*
+FUNCTION : Dashboard
+DESCRIPTION : This function creates the dashboard page for react application.
+PARAMETERS : none
+RETURNS : none
+*/
 export const Dashboard = () => {
   const [yoyoType, setYoyoType] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
@@ -21,6 +50,12 @@ export const Dashboard = () => {
   const [totalYield, setTotalYield] = React.useState(0);  
 
 
+  /*
+  FUNCTION : useEffect
+  DESCRIPTION : This function is called when component state changes.
+  PARAMETERS : none
+  RETURNS : none
+  */
   useEffect(() => {
     populateData(yoyoType)
 
@@ -32,11 +67,22 @@ export const Dashboard = () => {
     return () => clearInterval(interval); 
   }, [yoyoType])
 
-
+  /*
+  FUNCTION : childCallbackYoYoType
+  DESCRIPTION : This function is called when child component state changes.
+  PARAMETERS : value
+  RETURNS : none
+  */
   const childCallbackYoYoType = (value) => {
         setYoyoType(value)
   }
 
+  /*
+  FUNCTION : renderParetoChart
+  DESCRIPTION : This function renders pareto chart
+  PARAMETERS : defects
+  RETURNS : none
+  */
   const renderParetoChart = (defects) => {
     let myObj = { 'Defects': defects };
     return (
@@ -49,6 +95,12 @@ export const Dashboard = () => {
     );
   }
 
+  /*
+  FUNCTION : populateData
+  DESCRIPTION : This function calls server to get data for app.
+  PARAMETERS : id
+  RETURNS : none
+  */
   async function populateData(id) {
 
     // Get defect data.
