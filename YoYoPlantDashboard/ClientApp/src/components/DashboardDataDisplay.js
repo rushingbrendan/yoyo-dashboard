@@ -16,6 +16,25 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import NativeSelect from '@material-ui/core/NativeSelect';
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    minWidth: 275,
+  },
+  title: {
+    fontSize: 14,
+  },
+  pos: {
+    marginBottom: 12,
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+}));
+
 
 export default function DashboardDataDisplay(props) {
   const classes = useStyles();
@@ -33,7 +52,7 @@ export default function DashboardDataDisplay(props) {
       [name]: event.target.value,
     });
 
-    props.passToParent(event.target.value);
+    props.passToParentYoYoTypes(event.target.value);
 
   };
 
@@ -69,25 +88,25 @@ export default function DashboardDataDisplay(props) {
               </FormControl>
             </div>
             <div className="col-4">
-              <span>Total parts molded: 100</span>
+              <span>Total parts molded: {props.totalPartsMolded}</span>
               <br />
-              <span>Total parts successfully molded: 80</span>
+              <span>Total parts successfully molded: {props.totalPartsSuccessMolded}</span>
               <br />
-              <span>Yield at Mold: 0.80</span>
+              <span>Yield at Mold: {props.yieldAtMold}</span>
               <br />
-              <span>Total parts successfully painted: 70</span>
+              <span>Total parts successfully painted: {props.totalPartsSuccessPaint}</span>
               <br />
-              <span>Yield at Paint: 0.875</span>
+              <span>Yield at Paint: {props.yieldAtPaint}</span>
               <br />
             </div>
             <div className="col-4">
-              <span>Total parts successfully assembled: 60</span>
+              <span>Total parts successfully assembled: {props.totalPartsSuccessAssembly}</span>
               <br />
-              <span>Yield at Assembly: 0.875</span>
+              <span>Yield at Assembly: {props.yieldAtAssembly}</span>
               <br />
-              <span>Total parts packaged: 60</span>
+              <span>Total parts packaged: {props.totalPartsPackaged}</span>
               <br />
-              <span>Total Yield: 0.60</span>
+              <span>Total Yield: {props.totalYield}</span>
               <br />
             </div>
           </div>
@@ -96,71 +115,5 @@ export default function DashboardDataDisplay(props) {
 
       </CardContent>
     </Card>
-  );
-}
-
-
-
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    minWidth: 275,
-  },
-  title: {
-    fontSize: 14,
-  },
-  pos: {
-    marginBottom: 12,
-  },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-}));
-
-function NativeSelects() {
-  const classes = useStyles();
-  const [state, setState] = React.useState({
-    age: '',
-    name: 'hai',
-  });
-
-  const handleChange = (event) => {
-    const name = event.target.name;
-    setState({
-      ...state,
-      [name]: event.target.value,
-    });
-  };
-
-  return (
-    <div>
-      <FormControl variant="outlined" className={classes.formControl}>
-        <InputLabel htmlFor="outlined-age-native-simple">YoYo Types</InputLabel>
-        <Select
-          native
-          value={state.age}
-          onChange={handleChange}
-          label="YoYo Type"
-          inputProps={{
-            name: 'YoYo Types',
-            id: 'outlined-age-native-simple',
-          }}
-        >
-          <option value={0}>All Types</option>
-          <option value={1}>Original Sleeper</option>
-          <option value={2}>Black Beauty</option>
-          <option value={3}>Firecracker</option>
-          <option value={4}>Lemon Yellow</option>
-          <option value={5}>Midnight Blue</option>
-          <option value={6}>Screaming Orange</option>
-          <option value={7}>Gold Glitter</option>
-          <option value={8}>White Lightening</option>
-        </Select>
-      </FormControl>
-    </div>
   );
 }
