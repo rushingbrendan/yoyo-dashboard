@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 using YoYoPlantDashboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
+using System.Data.SqlClient;
 
 namespace YoYoPlantDashboard.Controllers
 {
@@ -76,17 +77,36 @@ namespace YoYoPlantDashboard.Controllers
         [HttpGet("/getDefects/{id}")]
         public IEnumerable<Defect> Get(int id)
         {
+            List<Defect> ld = new List<Defect>();
+            string queryString;
+            if (id == 0)
+            {
+                queryString = "SELECT Notes, count(*) FROM [yoyo_db].[dbo].[Yoyo_table] GROUP BY Notes;";
+            }
+            else
+            {
+                queryString = $"SELECT Notes, count(*) FROM [yoyo_db].[dbo].[Yoyo_table] WHERE ID = {id} GROUP BY Notes;";
+            }
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand command = new SqlCommand(queryString, connection);
+                connection.Open();
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                while (sqlDataReader.Read())
+                {
+                    if (sqlDataReader.GetString(0) != "")
+                        ld.Add(new Defect
+                        {
+                            DefectName = sqlDataReader.GetString(0),
+                            Defects = sqlDataReader.GetInt32(1),
+                        });
+                }
+            }
             //todo
             // Replace this random data with call to database.
             // Get all defects for this day related to id.
             // Id = 0 for all, or maps to product id.
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new Defect
-            {
-                DefectName = $"Defect Name - {index}",
-                Defects = rng.Next(0, 2500),
-            })
-            .ToArray();
+            return ld;
         }
     }
 }

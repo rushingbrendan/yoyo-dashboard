@@ -26,7 +26,7 @@ import React, { useEffect } from 'react';
 import ParetoChart from 'pareto-chart'
 import DashboardDataDisplay from './DashboardDataDisplay';
 
-const SERVER_CALL_INTERVAL_MS = 30000;
+const SERVER_CALL_INTERVAL_MS = 10000;
 
 
 /*

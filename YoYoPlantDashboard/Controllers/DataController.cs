@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 using YoYoPlantDashboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
+using System.Data.SqlClient;
 
 namespace YoYoPlantDashboard.Controllers
 {
@@ -40,6 +41,26 @@ namespace YoYoPlantDashboard.Controllers
     [Route("[controller]")]   
     public class DataController : ControllerBase
     {
+        enum Yoyo_States
+        {
+            QUEUE_INSPECTION_1,
+            INSPECTION_3_SCRAP,
+            INSPECTION_1,
+            INSPECTION_2_REWORK,
+            INSPECTION_2_SCRAP,
+            INSPECTION_1_SCRAP,
+            QUEUE_ASSEMBLY,
+            INSPECTION_3_REWORK,
+            PAINT,
+            INSPECTION_3,
+            ASSEMBLY,
+            QUEUE_INSPECTION_3,
+            MOLD,
+            QUEUE_PAINT,
+            PACKAGE,
+            INSPECTION_2,
+            QUEUE_INSPECTION_2
+        }
         /// <summary>
         /// Logger
         /// </summary>
@@ -81,25 +102,42 @@ namespace YoYoPlantDashboard.Controllers
             // Get all defects for this day related to id.
             // Id = 0 for all, or maps to product id.
 
+            Dictionary<string, int> dStateValues = new Dictionary<string, int>();
+            string queryString;
+            if (id == 0)
+            {
+                queryString = "SELECT Yoyo_State, count(*) FROM [yoyo_db].[dbo].[Yoyo_table] GROUP BY Yoyo_State;";
+            }
+            else
+            {
+                queryString = $"SELECT Yoyo_State, count(*) FROM [yoyo_db].[dbo].[Yoyo_table] WHERE ID = {id} GROUP BY Yoyo_State;";
+            }
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand command = new SqlCommand(queryString, connection);
+                connection.Open();
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                while (sqlDataReader.Read())
+                {
+                    dStateValues.Add(sqlDataReader.GetString(0), sqlDataReader.GetInt32(1));
+                }
+            }
+
             var rng = new Random();
             var data = new PlantData();
-            data.TotalPartsMolded = rng.Next(0, 10000);
-            data.TotalPartsPackaged = rng.Next(0, 10000);
-            data.TotalPartsSuccessAssembly = rng.Next(0, 10000);
-            data.TotalPartsSuccessMolded = rng.Next(0, 10000);
-            data.TotalPartsSuccessPaint = rng.Next(0, 10000);
+            data.TotalPartsMolded = dStateValues[Enum.GetName(typeof(Yoyo_States), Yoyo_States.MOLD)];
+            data.TotalPartsPackaged = dStateValues[Enum.GetName(typeof(Yoyo_States), Yoyo_States.PACKAGE)];
+            data.TotalPartsSuccessAssembly = data.TotalPartsPackaged;
+            data.TotalPartsSuccessMolded = dStateValues[Enum.GetName(typeof(Yoyo_States), Yoyo_States.QUEUE_PAINT)];
+            data.TotalPartsSuccessPaint = dStateValues[Enum.GetName(typeof(Yoyo_States), Yoyo_States.QUEUE_ASSEMBLY)];
 
-            double rand = rng.NextDouble();
-            data.YieldAtMold = (float)rand;
+            data.YieldAtMold = (float)data.TotalPartsSuccessMolded / (float)data.TotalPartsMolded;
 
-            rand = rng.NextDouble();
-            data.YieldAtPaint = (float)rand;
+            data.YieldAtPaint = (float)data.TotalPartsSuccessPaint / (float)data.TotalPartsSuccessMolded;
 
-            rand = rng.NextDouble();
-            data.YieldAtAssembly = (float)rand;
+            data.YieldAtAssembly = (float)data.TotalPartsSuccessAssembly / (float)data.TotalPartsSuccessPaint;
 
-            rand = rng.NextDouble();
-            data.TotalYield = (float)rand;
+            data.TotalYield = (float)data.TotalPartsPackaged / (float)data.TotalPartsMolded;
 
             return data;
         }
